@@ -42,12 +42,7 @@ print_line:
 read_line:
   mov di, line_buffer
   ; clear string buffer
-<<<<<<< HEAD
-  mov [di], 0
-=======
-  mov al, 0
-  stosb
->>>>>>> adf94b6ff06a8b5869d08918a64d1846ec621a65
+  mov [di], byte 0
   mov cx, 0 ; string length 
 .read_line_repeat:
   ; read char
