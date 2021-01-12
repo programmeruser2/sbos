@@ -117,19 +117,19 @@ compare_strings:
 ; interpreter
 interpret:
   ; command string is in si register
-  mov cx, 0
+  mov bx, 0
 .interpret_loop:
-  cmp [commands + cx], 0
+  cmp [commands + bx], 0
   je .interpret_error
-  mov di, [commands + cx]
+  mov di, [commands + bx]
   ; compare strings
   call compare_strings
   cmp ax, 1
   je .interpret_end
-  add cx, 2
+  add bx, 2
 .interpret_end:
-  add cx, 1
-  call [commands + cx]
+  add bx, 1
+  call [commands + bx]
   ret
 .interpret_error:
   mov di, si ; relocation
