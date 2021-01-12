@@ -119,7 +119,7 @@ interpret:
   ; command string is in si register
   mov bx, 0
 .interpret_loop:
-  cmp [commands + bx], 0
+  cmp [commands + bx], byte 0
   je .interpret_error
   mov di, [commands + bx]
   ; compare strings
