@@ -20,6 +20,7 @@ loop:
   call print_line
   jmp loop
 print:
+  ; prints string in si
   mov ah, 0x0e
 .print_repeat:
   lodsb
@@ -40,6 +41,7 @@ print_line:
   call print
   call print_newline
 read_line:
+  ; reads one line into line_buffer
   mov di, line_buffer
   ; clear string buffer
   mov [di], byte 0
@@ -89,6 +91,22 @@ read_line:
   stosb
   ; print newline
   call print_newline
+  ret
+compare_strings:
+  ; compares strings in the registers si and di, returns 0 in ax if false and 1 in ax otherwise
+.compare_strings_loop:
+  mov ax, [si]
+  cmp [di], ax
+  jne .compare_strings_not_equals
+  cmp [si], byte 0
+  je .compare_strings_equals
+  inc si
+  inc di
+.compare_strings_not_equals:
+  mov ax, 0
+  ret
+.compare_strings_equals:
+  mov ax, 1
   ret
 times 510-($-$$) db 0
 dw 0xaa55
