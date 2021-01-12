@@ -42,8 +42,7 @@ print_line:
 read_line:
   mov di, line_buffer
   ; clear string buffer
-  mov al, 0
-  stosb
+  mov [di], 0
   mov cx, 0 ; string length 
 .read_line_repeat:
   ; read char
