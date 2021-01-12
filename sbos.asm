@@ -95,8 +95,10 @@ read_line:
   ; add null terminator
   mov al, 0
   stosb
-  ; print newline
-  call print_newline
+  ; print newline char
+  mov ah, 0x0e
+  mov al, 0x0a
+  int 0x10
   ret
 compare_strings:
   ; compares strings in the registers si and di, returns 0 in ax if false and 1 in ax otherwise
