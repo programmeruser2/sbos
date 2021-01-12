@@ -1,7 +1,13 @@
 bits 16
 org 0x7c00
 prompt: db "$ ", 0
+interpret_error_msg: db "Unknown command '", 0
 line_buffer: equ 0x7e00 ; line buffer
+commands: ; list of commands
+  db "echo",
+  db echo_command,
+  db 0, 
+  db 0 ; terminator
 start:
   ; setup segments
   mov bp, 0x7c00
@@ -17,7 +23,7 @@ loop:
   call print
   call read_line
   mov si, line_buffer
-  call print_line
+  call interpret
   jmp loop
 print:
   ; prints string in si
@@ -108,5 +114,40 @@ compare_strings:
 .compare_strings_equals:
   mov ax, 1
   ret
+; interpreter
+interpret:
+  ; command string is in si register
+  mov cx, 0
+.interpret_loop:
+  cmp [commands + cx], 0
+  je .interpret_error
+  mov di, [commands + cx]
+  ; compare strings
+  call compare_strings
+  cmp ax, 1
+  je .interpret_end
+  add cx, 2
+.interpret_end:
+  add cx, 1
+  call [commands + cx]
+  ret
+.interpret_error:
+  mov di, si ; relocation
+  mov si, interpret_error_msg
+  call print
+  mov si, di ; put back into si
+  call print
+  mov ah, 0x0e
+  mov al, "'"
+  int 0x10
+  call print_newline
+  ret
+
+; commands
+echo_command:
+  call read_line
+  mov si, line_buffer
+  call print_line
+
 times 510-($-$$) db 0
 dw 0xaa55
