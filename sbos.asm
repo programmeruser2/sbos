@@ -19,11 +19,11 @@ loop:
   jmp loop
 print:
   ; prints string in si
-  mov ah, 0x0e
 .print_repeat:
   lodsb
   cmp al, 0
   je .print_end
+  mov ah, 0x0e
   int 0x10
   jmp .print_repeat
 .print_end:
@@ -32,12 +32,14 @@ print_newline:
   mov ah, 0x0e
   mov al, 0x0d ; carriage return
   int 0x10
+  mov ah, 0x0e
   mov al, 0x0a ; newline 
   int 0x10
   ret
 print_line:
   call print
   call print_newline
+  ret 
 read_line:
   ; reads one line into line_buffer
   mov di, line_buffer
@@ -94,19 +96,26 @@ read_line:
   ret
 compare_strings:
   ; compares strings in the registers si and di, returns 0 in ax if false and 1 in ax otherwise
+  push si
+  push di 
 .compare_strings_loop:
-  mov ax, [si]
-  cmp [di], ax
+  mov al, byte [si]
+  cmp byte [di], al 
   jne .compare_strings_not_equals
-  cmp [si], byte 0
+  cmp byte [si], byte 0
   je .compare_strings_equals
   inc si
   inc di
+  jmp .compare_strings_loop
 .compare_strings_not_equals:
   mov ax, 0
+  pop di 
+  pop si 
   ret
 .compare_strings_equals:
   mov ax, 1
+  pop di 
+  pop si 
   ret
 ; interpreter
 interpret:
@@ -120,9 +129,10 @@ interpret:
   call compare_strings
   cmp ax, 1
   je .interpret_end
-  add bx, 2
+  add bx, 4
+  jmp .interpret_loop 
 .interpret_end:
-  add bx, 1
+  add bx, 2
   call [commands + bx]
   ret
 .interpret_error:
@@ -141,14 +151,18 @@ interpret:
 echo_command:
   call read_line
   mov si, line_buffer
-  call print_line
+  call print_line 
+  ret 
+
 prompt: db "$ ", 0
 interpret_error_msg: db "Unknown command '", 0
 line_buffer: equ 0x7e00 ; line buffer
+echo_str: db "echo", 0 
 commands: ; list of commands
-  db "echo",
-  db echo_command,
-  db 0, 
-  db 0 ; terminator
+  dw echo_str,
+  dw echo_command,
+  dw 0, 
+  dw 0 ; terminator
+
 times 510-($-$$) db 0
 dw 0xaa55
