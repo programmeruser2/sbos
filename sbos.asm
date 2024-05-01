@@ -1,13 +1,5 @@
 bits 16
 org 0x7c00
-prompt: db "$ ", 0
-interpret_error_msg: db "Unknown command '", 0
-line_buffer: equ 0x7e00 ; line buffer
-commands: ; list of commands
-  db "echo",
-  db echo_command,
-  db 0, 
-  db 0 ; terminator
 start:
   ; setup segments
   mov bp, 0x7c00
@@ -150,6 +142,13 @@ echo_command:
   call read_line
   mov si, line_buffer
   call print_line
-
+prompt: db "$ ", 0
+interpret_error_msg: db "Unknown command '", 0
+line_buffer: equ 0x7e00 ; line buffer
+commands: ; list of commands
+  db "echo",
+  db echo_command,
+  db 0, 
+  db 0 ; terminator
 times 510-($-$$) db 0
 dw 0xaa55
