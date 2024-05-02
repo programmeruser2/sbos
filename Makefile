@@ -12,12 +12,12 @@ test: sbos.img
 debug: sbos.img
 	qemu-system-i386 -s -S -drive file=sbos.img,index=0,if=floppy,format=raw 
 sbos_debug.elf: sbos.asm
-	sed '/org 0x7c00/d' ./sbos.asm > /tmp/sbos_debug.asm	
-	nasm -felf32 -g3 -F dwarf /tmp/sbos_debug.asm -o sbos_debug.o
+	sed '/org 0x7c00/d' ./sbos.asm > sbos_debug.asm	
+	nasm -felf32 -g3 -F dwarf sbos_debug.asm -o sbos_debug.o
 	ld -Ttext=0x7c00 -melf_i386 sbos_debug.o -o sbos_debug.elf 
-	rm *.o /tmp/sbos_debug.asm 
+	rm *.o sbos_debug.asm 
 gdb:
-	gdb -ex 'target remote localhost:1234' -ex 'set architecture i8086' -ex 'break *0x7c00' -ex 'continue' sbos_debug.elf
+	gdb -ex 'target remote localhost:1234' -ex 'set tdesc filename target.xml' -ex 'set architecture i8086' -ex 'break *0x7c00' -ex 'continue' sbos_debug.elf
 
 
 
