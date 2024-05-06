@@ -9,10 +9,26 @@ start:
   mov sp, kernel_stack 
 loop:
   ; execution falls through to here
-
-  ; loop
-  call panic 
+  ; overwrite the timer handler because otherwise the previous handler will mess with it 
+  mov ax, 0x20 
+  mov word [ax], cs 
+  add ax, 0x2 
+  mov word [ax], timer_handler 
+  ; loop 
   jmp $ 
+timer_handler: 
+  pusha 
+  push ds 
+  push es 
+  push fs 
+  push gs 
+  push ax 
+  xor ax, ax 
+  mov ds, ax 
+  mov es, ax 
+  mov fs, ax 
+  mov gs, ax
+  pop ax 
 panic: 
   mov si, panic_msg 
   call print_line
